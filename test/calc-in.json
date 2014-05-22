@@ -1,0 +1,24 @@
+{
+	"op": "add",
+	"value": 1
+}
+{
+	"op": "add",
+	"value": 1
+}
+{
+	"op": "mul",
+	"value": 7
+}
+{
+	"op": "sub",
+	"value": 1
+}
+{
+	"op": "add",
+	"value": 14
+}
+{
+	"op": "div",
+	"value": 3
+}

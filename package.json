@@ -1,0 +1,21 @@
+{
+	"name": "cloud-tycoon",
+	"description": "Simulation Toolkit",
+	"version": "0.1.0",
+	"author": "Keith M Wesolowski (keith.wesolowski@joyent.com)",
+	"private": true,
+	"dependencies": {
+		"assert-plus": "~0.1.4",
+		"extsprintf": "~1.0.3",
+		"lstream": "~0.0.4",
+		"verror": "~1.4.0",
+		"jsprim": "~0.5.1"
+	},
+	"devDependencies": {
+		"tap": "0.4.0"
+	},
+	"scripts": {
+		"start": "node ./bin/msdb.js",
+		"test": "./node_modules/.bin/tap test/*.test.js"
+	}
+}
