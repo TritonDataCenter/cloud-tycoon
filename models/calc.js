@@ -5,6 +5,7 @@
 var mod_assert = require('assert-plus');
 var mod_util = require('util');
 var mod_fs = require('fs');
+var mod_stream = require('stream');
 
 var lstream = require('lstream');
 var JSONStream = require('../lib/jsonstream.js');
@@ -28,10 +29,9 @@ var CT_simulation = require('../lib/CT_simulation.js');
  *
  * {
  * 	pre: <integer> (the accumulator value prior to execution),
- *	pc: <integer> (program counter address of the instruction),
  *	insn: <object> (the instruction executed),
+ *	addr: <integer> (the address of the instruction),
  *	post: <integer> (the accumulator value after execution),
- *	nextpc: <integer> (the address of the next instruction)
  * }
  *
  * This needs to be kept working; if it does not work, the generic nature of
@@ -39,12 +39,44 @@ var CT_simulation = require('../lib/CT_simulation.js');
  */
 
 function
+CalcInsnStream(arg)
+{
+	var self = this;
+	var stropts;
+	var calc;
+
+	mod_assert.object(arg, 'arg');
+	mod_assert.object(arg.calc, 'arg.calc');
+	mod_assert.optionalObject(arg.stropts, 'arg.stropts');
+	stropts = arg.stropts || {};
+
+	stropts.objectMode = true;
+	stropts.highWaterMark = 0;
+	mod_stream.Transform.call(this, stropts);
+
+	calc = arg.calc;
+
+	this._transform = function (insn, __ignored, done) {
+		var out = {};
+
+		out.insn = insn;
+		out.addr = calc._pc++;
+
+		self.push(out);
+		done();
+	};
+}
+mod_util.inherits(CalcInsnStream, mod_stream.Transform);
+CalcInsnStream.prototype.name = 'CalcInsnStream';
+
+function
 Calc(arg)
 {
 	CT_model.call(this);
 
-	this._accum = 0;
+	this._simulation = arg.simulation;
 	this._pc = 0;
+	this._accum = 0;
 }
 mod_util.inherits(Calc, CT_model);
 Calc.prototype.name = 'Calc';
@@ -54,6 +86,8 @@ Calc.prototype.init = function (arg)
 	var self = this;
 	var result;
 	var infile;
+	var open_done = false;
+	var xform_err;
 
 	mod_assert.object(arg, 'arg');
 	mod_assert.optionalObject(arg.args, 'arg.args');
@@ -70,18 +104,30 @@ Calc.prototype.init = function (arg)
 	}
 
 	this._accum = 0;
-	this._pc = 0;
+
+	xform_err = function (err) {
+		if (open_done)
+			self._simulation.set_input_error({ err: err });
+		else
+			arg.cb({ err: err });
+	};
 
 	infile = mod_fs.createReadStream(arg.args[0]);
+	infile.on('error', xform_err);
 	infile.on('open', function () {
+		var ls = new lstream();
+		var js = new JSONStream();
+		var is = new CalcInsnStream({ calc: self });
+
+		ls.on('error', xform_err);
+		js.on('error', xform_err);
+		is.on('error', xform_err);
+
 		result = {
-			input: infile.pipe(new lstream()).pipe(new JSONStream())
+			input: infile.pipe(ls).pipe(js).pipe(is)
 		};
+		open_done = true;
 		arg.cb(result);
-	});
-	/* XXX need to handle inline errors too. */
-	infile.on('error', function (err) {
-		arg.cb({ err: err });
 	});
 };
 
@@ -92,10 +138,10 @@ Calc.prototype.exec = function (arg)
 	var result = {};
 
 	mod_assert.object(arg, 'arg');
-	mod_assert.object(arg.insn, 'arg.insn');
+	mod_assert.object(arg.ictx, 'arg.ictx');
 	mod_assert.func(arg.cb, 'arg.cb');
 
-	insn = arg.insn;
+	insn = arg.ictx.insn;
 
 	if (typeof (insn.op) !== 'string' ||
 	    typeof (insn.value) !== 'number') {
@@ -107,7 +153,6 @@ Calc.prototype.exec = function (arg)
 
 	result.data = {
 		pre: self._accum,
-		pc: self._pc,
 		insn: insn
 	};
 
@@ -133,8 +178,8 @@ Calc.prototype.exec = function (arg)
 		return;
 	}
 
+	result.data.addr = arg.ictx.addr;
 	result.data.post = self._accum;
-	result.data.nextpc = ++self._pc;
 	result.data.toString = function () {
 		return (JSON.stringify(result.data));
 	};
@@ -143,6 +188,11 @@ Calc.prototype.exec = function (arg)
 	setTimeout(function () {
 		arg.cb(result);
 	}, 1000);
+};
+
+Calc.prototype.nextaddr = function ()
+{
+	return (this._pc);
 };
 
 function

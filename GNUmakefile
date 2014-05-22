@@ -31,7 +31,6 @@ JSL_FILES_NODE	 = $(JS_FILES)
 JSSTYLE_FILES	 = $(JS_FILES)
 JSSTYLE_FLAGS	 = -f tools/jsstyle.conf
 REPO_MODULES	 = src/node-dummy
-SMF_MANIFESTS_IN = smf/manifests/bapi.xml.in
 
 NODE_PREBUILT_VERSION=v0.8.22
 
@@ -52,7 +51,7 @@ include ./tools/mk/Makefile.smf.defs
 # Repo-specific targets
 #
 .PHONY: all
-all: $(SMF_MANIFESTS) | $(TAP) $(REPO_DEPS)
+all: | $(TAP) $(REPO_DEPS)
 	$(NPM) rebuild
 
 $(TAP): | $(NPM_EXEC)

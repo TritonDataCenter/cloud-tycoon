@@ -15,7 +15,7 @@
 		"tap": "0.4.0"
 	},
 	"scripts": {
-		"start": "node ./bin/msdb.js",
+		"start": "node ./bin/ctc.js",
 		"test": "./node_modules/.bin/tap test/*.test.js"
 	}
 }
