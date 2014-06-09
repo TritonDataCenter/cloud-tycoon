@@ -1,7 +1,7 @@
 # Cloud Tycoon
 
-Repository: <git@git.joyent.com:cloud-tycoon.git>
-Browsing: <https://mo.joyent.com/cloud-tycoon>
+Repository: <git@github.com:joyent/cloud-tycoon>
+Browsing: <https://github.com/joyent/cloud-tycoon>
 Who: Keith M Wesolowski
 Docs: <https://mo.joyent.com/docs/cloud-tycoon>
 Tickets/bugs: <https://devhub.joyent.com/jira/browse/TOOLS>
@@ -28,14 +28,25 @@ This is documentation to be written later.
 
 # Development
 
-Before commiting/pushing run `make prepush` and, if possible, get a code
+Do not use Github issues (they have been disabled for this repository).  Do not
+submit pull requests.  Every change to this repository requires a bug or RFE
+in the Jira database.
+
+*Important*: There is at most one commit for each bug ID in this repository,
+and the comment associated with that commit must be of the same form as in
+illumos-joyent; that is:
+
+TOOLS-9999 synopsis of bug from Jira
+
+You may fix multiple bugs in a single commit; however, they should be
+related either conceptually or have overlapping code changes.
+
+Before pushing anything, run `gmake prepush` and, if possible, get a code
 review.
-
-
 
 # Testing
 
     gmake test
 
-If you project has setup steps necessary for testing, then describe those
-here.
+Which currently does nothing useful.  This section will be updated with more
+detailed test information when available.

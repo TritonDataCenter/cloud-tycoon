@@ -43,7 +43,7 @@ CalcInsnStream(arg)
 {
 	var self = this;
 	var stropts;
-	var calc;
+	var pc = 0;
 
 	mod_assert.object(arg, 'arg');
 	mod_assert.object(arg.calc, 'arg.calc');
@@ -54,13 +54,11 @@ CalcInsnStream(arg)
 	stropts.highWaterMark = 0;
 	mod_stream.Transform.call(this, stropts);
 
-	calc = arg.calc;
-
 	this._transform = function (insn, __ignored, done) {
 		var out = {};
 
 		out.insn = insn;
-		out.addr = calc._pc++;
+		out.addr = pc++;
 
 		self.push(out);
 		done();
@@ -75,7 +73,6 @@ Calc(arg)
 	CT_model.call(this);
 
 	this._simulation = arg.simulation;
-	this._pc = 0;
 	this._accum = 0;
 }
 mod_util.inherits(Calc, CT_model);
@@ -188,11 +185,6 @@ Calc.prototype.exec = function (arg)
 	setTimeout(function () {
 		arg.cb(result);
 	}, 1000);
-};
-
-Calc.prototype.nextaddr = function ()
-{
-	return (this._pc);
 };
 
 function
