@@ -178,7 +178,7 @@ Calc.prototype.exec = function (arg)
 	result.data.addr = arg.ictx.addr;
 	result.data.post = self._accum;
 	result.data.toString = function () {
-		return (JSON.stringify(result.data));
+		return (JSON.stringify(result.data) + '\n');
 	};
 	result.done = true;
 
