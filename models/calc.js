@@ -43,10 +43,8 @@ CalcInsnStream(arg)
 {
 	var self = this;
 	var stropts;
-	var pc = 0;
 
 	mod_assert.object(arg, 'arg');
-	mod_assert.object(arg.calc, 'arg.calc');
 	mod_assert.optionalObject(arg.stropts, 'arg.stropts');
 	stropts = arg.stropts || {};
 
@@ -54,11 +52,13 @@ CalcInsnStream(arg)
 	stropts.highWaterMark = 0;
 	mod_stream.Transform.call(this, stropts);
 
+	self._pc = 0;
+
 	this._transform = function (insn, __ignored, done) {
 		var out = {};
 
 		out.insn = insn;
-		out.addr = pc++;
+		out.addr = self._pc++;
 
 		self.push(out);
 		done();
@@ -114,7 +114,7 @@ Calc.prototype.init = function (arg)
 	infile.on('open', function () {
 		var ls = new lstream();
 		var js = new JSONStream();
-		var is = new CalcInsnStream({ calc: self });
+		var is = new CalcInsnStream({});
 
 		ls.on('error', xform_err);
 		js.on('error', xform_err);
