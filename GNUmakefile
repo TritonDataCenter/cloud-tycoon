@@ -40,11 +40,16 @@ JSSTYLE_FLAGS	 = -f tools/jsstyle.conf
 REPO_MODULES	 = src/node-dummy
 
 NODE_PREBUILT_VERSION=v0.8.22
-
 ifeq ($(shell uname -s),SunOS)
-	NODE_PREBUILT_CC_VERSION=4.6.2
 	NODE_PREBUILT_TAG=zone
+	# Allow building on a SmartOS image other than sdc-smartos@1.6.3.
+	NODE_PREBUILT_IMAGE=fd2cc906-8938-11e3-beab-4359c665ac99
 endif
+
+# ifeq ($(shell uname -s),SunOS)
+# 	NODE_PREBUILT_CC_VERSION=4.6.2
+# 	NODE_PREBUILT_TAG=zone
+# endif
 
 include ./tools/mk/Makefile.defs
 ifeq ($(shell uname -s),SunOS)
