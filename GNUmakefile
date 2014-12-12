@@ -39,12 +39,22 @@ JSSTYLE_FILES	 = $(JS_FILES)
 JSSTYLE_FLAGS	 = -f tools/jsstyle.conf
 REPO_MODULES	 = src/node-dummy
 
-NODE_PREBUILT_VERSION=v0.8.22
+# NODE_PREBUILT_VERSION=v0.10.32
+# ifeq ($(shell uname -s),SunOS)
+# 	NODE_PREBUILT_TAG=zone
+# 	NODE_PREBUILT_IMAGE=de411e86-548d-11e4-a4b7-3bb60478632a
+# endif
 
+NODE_PREBUILT_VERSION=v0.10.32
 ifeq ($(shell uname -s),SunOS)
-	NODE_PREBUILT_CC_VERSION=4.6.2
 	NODE_PREBUILT_TAG=zone
+	NODE_PREBUILT_IMAGE=fd2cc906-8938-11e3-beab-4359c665ac99
 endif
+
+# ifeq ($(shell uname -s),SunOS)
+# 	NODE_PREBUILT_CC_VERSION=4.6.2
+# 	NODE_PREBUILT_TAG=zone
+# endif
 
 include ./tools/mk/Makefile.defs
 ifeq ($(shell uname -s),SunOS)
@@ -58,7 +68,7 @@ include ./tools/mk/Makefile.smf.defs
 # Repo-specific targets
 #
 .PHONY: all
-all: | $(TAP) $(REPO_DEPS)
+all: | $(NPM_EXEC) $(TAP) $(REPO_DEPS)
 	$(NPM) rebuild
 
 $(TAP): | $(NPM_EXEC)
