@@ -10,7 +10,7 @@
 		"lstream": "~0.0.4",
 		"verror": "~1.4.0",
 		"jsprim": "~0.5.1",
-		"dapi": "git+ssh://git@github.com:joyent/sdc-designation.git#master"
+		"dapi": "git+https://github.com/joyent/sdc-designation.git#master"
 	},
 	"devDependencies": {
 		"tap": "0.4.0"
